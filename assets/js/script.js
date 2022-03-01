@@ -41,7 +41,7 @@ var cityClickHandler = function(event) {
 var getCityCoordinates = function(city) {
 
     // API url
-    var requestUrl = "http://api.openweathermap.org/geo/1.0/direct?q=" + city + "&limit=1&units=imperial&appid=" + apiKey;
+    var requestUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + city + "&limit=1&units=imperial&appid=" + apiKey;
 
     // fetch request
     fetch(requestUrl).then(function(response) {
