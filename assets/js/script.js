@@ -1,3 +1,5 @@
+var apiKey = "242a029e7df5879d31497e5779e1483e";
+
 // global variables
 var submitButton = document.querySelector("#submit")
 var cityButtons = document.querySelector("#city-button-section")
@@ -9,12 +11,10 @@ var cityButtonSectionEl = document.querySelector("#city-button-section")
 var forecastBox = document.querySelector("#forecast-header")
 var uviRowEl = document.querySelector("#uvi-row")
 
-var apiKey = "242a029e7df5879d31497e5779e1483e";
-
 // get cities from local storage
 var citiesArr = JSON.parse(localStorage.getItem('cities')) || [];
 
-
+// submit city
 var citySubmitHandler = function(event) {
     // prevent page refresh
     event.preventDefault();
@@ -31,6 +31,7 @@ var citySubmitHandler = function(event) {
     }
 }
 
+// click on city button
 var cityClickHandler = function(event) {
     if(event.target.id) {
         getCityCoordinates(event.target.id)
@@ -64,9 +65,10 @@ var getCityCoordinates = function(city) {
             cityEl.textContent = data[0].name;
             cityTitleRowEl.appendChild(cityEl)
 
-
+            // check if localstorage already has city name
             if (!citiesArr.includes(data[0].name)) {
-                // append new city to side
+
+                // append new city button to side
                 var cityButtonEl = document.createElement("button");
                 cityButtonEl.setAttribute("id", data[0].name)
                 cityButtonEl.addEventListener("click", cityClickHandler);
@@ -118,7 +120,7 @@ var displayWeatherData = function(weatherData) {
 
     // append icon to city title row
     var iconEl = document.createElement("img");
-    iconEl.src = "http://openweathermap.org/img/wn/" + weatherData.current.weather[0].icon + ".png";
+    iconEl.src = "https://openweathermap.org/img/wn/" + weatherData.current.weather[0].icon + ".png";
     var src = document.getElementById("current-weather-section");
     cityTitleRowEl.appendChild(iconEl);
 
@@ -137,13 +139,11 @@ var displayWeatherData = function(weatherData) {
 
     // append uv index to current weather section
     currentWeatherEl.appendChild(uviRowEl)
+
     var uviEl = document.createElement("p");
     var uviCondition = document.createElement("p");
-
     uviEl.textContent = "UV Index: "
-    console.log(uviEl.textContent)
     uviCondition.textContent = weatherData.current.uvi
-
     uviRowEl.appendChild(uviEl)
     uviRowEl.appendChild(uviCondition)
 
