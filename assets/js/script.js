@@ -1,10 +1,17 @@
 // global variables
 var submitButton = document.querySelector("#submit")
+var cityButtons = document.querySelector("#city-button-section")
 var searchInputEl = document.querySelector("#search-input")
 var currentWeatherEl = document.querySelector("#current-weather-section")
+var cityTitleRowEl = document.querySelector("#city-title-row")
 var dailyWeatherEl = document.querySelector("#forecast-section")
+var cityButtonSectionEl = document.querySelector("#city-button-section")
+var forecastBox = document.querySelector("#forecast-header")
+var uviRowEl = document.querySelector("#uvi-row")
 
-var savedCities = JSON.parse(localStorage.getItem("cityListObj"))
+// get cities from local storage
+var citiesArr = JSON.parse(localStorage.getItem('cities')) || [];
+
 
 var citySubmitHandler = function(event) {
     // prevent page refresh
@@ -15,35 +22,18 @@ var citySubmitHandler = function(event) {
 
     if (city) {
         getCityCoordinates(city);
-
-        // clear old content
-        currentWeatherEl.textContent = "";
-        dailyWeatherEl.textContent = "";
+        
     } else {
         alert("Please enter a valid city.")
         return false;
     }
-
-    // append weather container to page
-
-    // append city header to page
-    var cityEl = document.createElement("h2");
-    cityEl.textContent = city;
-    currentWeatherEl.appendChild(cityEl)
-
-    // save city to local storage
-    var savedCities = {
-        value: city,
-        }
-
-        savedCitiesList.push(savedCities);
-        localStorage.setItem("cities", JSON.stringify(savedCitiesList));
-
-
-    // append cities into buttons
-
 }
 
+var cityClickHandler = function(event) {
+    if(event.target.id) {
+        getCityCoordinates(event.target.id)
+    }
+}
 
 // get the API
 var getCityCoordinates = function(city) {
@@ -53,13 +43,42 @@ var getCityCoordinates = function(city) {
 
     // fetch request
     fetch(requestUrl).then(function(response) {
-        if(response.ok) {
-            response.json().then(function(data) {
-                getWeatherData(data[0].lat, data[0].lon);
-            })
-        } else {
-            alert("error: City Not Found");
-        }
+        response.json().then(function(data) {
+            if(data.length === 0) {
+            currentWeatherEl.textContent = "No results found.";
+            return;
+            }
+            // clear old content
+            currentWeatherEl.textContent = "";
+            cityTitleRowEl.textContent = "";
+            dailyWeatherEl.textContent = "";
+            searchInputEl.value = "";
+            forecastBox.textContent = "";
+            uviRowEl.textContent = "";
+
+            // append city header to page
+            currentWeatherEl.appendChild(cityTitleRowEl)
+            var cityEl = document.createElement("h2");
+            cityEl.textContent = data[0].name;
+            cityTitleRowEl.appendChild(cityEl)
+
+
+            if (!citiesArr.includes(data[0].name)) {
+                // append new city to side
+                var cityButtonEl = document.createElement("button");
+                cityButtonEl.setAttribute("id", data[0].name)
+                cityButtonEl.addEventListener("click", cityClickHandler);
+                cityButtonEl.className = "city-btn btn"
+                cityButtonEl.textContent = data[0].name;
+                cityButtonSectionEl.appendChild(cityButtonEl);
+
+                // save cities to local storage
+                citiesArr.push(data[0].name);
+                localStorage.setItem('cities', JSON.stringify(citiesArr));
+            }
+            
+            getWeatherData(data[0].lat, data[0].lon);
+        })
     })
 }
 
@@ -80,10 +99,9 @@ function getWeatherData(lat, lon) {
 }
 
 var displayWeatherData = function(weatherData) {
-    // check if api returned any repos
-    if (weatherData.length === 0) {
-        repoContainerEl.textContent = "No results found.";
-        return;
+    if(weatherData.length === 0) {
+    currentWeatherEl.textContent = "No results found.";
+    return;
     }
 
     // format date
@@ -91,18 +109,18 @@ var displayWeatherData = function(weatherData) {
     var formatDate = new Date (unixTime * 1000)
     var date = formatDate.toLocaleDateString()
 
-    // append date to page
+    // append date to city title row
     var dateEl = document.createElement("h2")
-    dateEl.textContent = date
-    currentWeatherEl.appendChild(dateEl) 
+    dateEl.textContent = "(" + date + ")";
+    cityTitleRowEl.appendChild(dateEl) 
 
-    // append icon to page
+    // append icon to city title row
     var iconEl = document.createElement("img");
     iconEl.src = "http://openweathermap.org/img/wn/" + weatherData.current.weather[0].icon + ".png";
     var src = document.getElementById("current-weather-section");
-    currentWeatherEl.appendChild(iconEl);
+    cityTitleRowEl.appendChild(iconEl);
 
-    // append current weather data to page
+    // append current weather data to current weather section
     var tempEl = document.createElement("p");
     tempEl.textContent = "Temp: " + weatherData.current.temp + "°F";
     currentWeatherEl.appendChild(tempEl)
@@ -115,15 +133,37 @@ var displayWeatherData = function(weatherData) {
     humidityEl.textContent = "Humidity: " + weatherData.current.humidity + "%";
     currentWeatherEl.appendChild(humidityEl)
 
+    // append uv index to current weather section
+    currentWeatherEl.appendChild(uviRowEl)
     var uviEl = document.createElement("p");
-    uviEl.textContent = "UV Index: " + weatherData.current.uvi;
-    currentWeatherEl.appendChild(uviEl)
+    var uviCondition = document.createElement("p");
+
+    uviEl.textContent = "UV Index: "
+    console.log(uviEl.textContent)
+    uviCondition.textContent = weatherData.current.uvi
+
+    uviRowEl.appendChild(uviEl)
+    uviRowEl.appendChild(uviCondition)
+
+    // check for UV Index conditions
+    if (weatherData.current.uvi <= 2) {
+        uviCondition.className = "favorable"
+    } else if (weatherData.current.uvi >= 7) {
+        uviCondition.className = "severe"
+    } else {
+        uviCondition.className = "moderate"
+    }
+
+    // append 5 day forecast container to page
+    var dayHeaderEl = document.createElement("h3");
+    dayHeaderEl.textContent = "5-Day Forecast:"
+    forecastBox.appendChild(dayHeaderEl)
 
     // loop over weather to get next 5 days
     for (var i = 1; i < 6; i++) {
 
         // create div elements with classes
-        var dailyWeatherBox = document.createElement('div');
+        var dailyWeatherBox = document.createElement("div");
         dailyWeatherBox.className = "day-block"
 
         // format date
@@ -135,7 +175,6 @@ var displayWeatherData = function(weatherData) {
         var dailyDateEl = document.createElement("h4")
         dailyDateEl.textContent = date
         dailyWeatherBox.appendChild(dailyDateEl) 
-
 
         // create icon element and append to box
         var iconEl = document.createElement("img");
@@ -165,5 +204,14 @@ var displayWeatherData = function(weatherData) {
 
 }
 
-
 submitButton.addEventListener("click", citySubmitHandler);
+
+// create buttons from local storage on page refresh
+for (var i = 0; i < citiesArr.length; i++) {
+    var cityButtonEl = document.createElement("button");
+    cityButtonEl.className = "city-btn btn"
+    cityButtonEl.setAttribute("id", citiesArr[i])
+    cityButtonEl.addEventListener("click", cityClickHandler);
+    cityButtonEl.textContent = citiesArr[i];
+    cityButtonSectionEl.appendChild(cityButtonEl);
+}
