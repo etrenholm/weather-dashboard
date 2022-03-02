@@ -31,14 +31,14 @@ var citySubmitHandler = function(event) {
     }
 }
 
-// click on city button
+// click on city button - resubmit city
 var cityClickHandler = function(event) {
     if(event.target.id) {
         getCityCoordinates(event.target.id)
     }
 }
 
-// get the API
+// get the API to get the coordinates
 var getCityCoordinates = function(city) {
 
     // API url
@@ -51,7 +51,7 @@ var getCityCoordinates = function(city) {
             currentWeatherEl.textContent = "No results found.";
             return;
             }
-            // clear old content
+            // if result is found clear old content
             currentWeatherEl.textContent = "";
             cityTitleRowEl.textContent = "";
             dailyWeatherEl.textContent = "";
@@ -81,12 +81,13 @@ var getCityCoordinates = function(city) {
                 localStorage.setItem('cities', JSON.stringify(citiesArr));
             }
             
+            // push coordinates to next fetch request
             getWeatherData(data[0].lat, data[0].lon);
         })
     })
 }
 
-// get the API
+// get the API to get the weather data
 function getWeatherData(lat, lon) {
 
     // API url
