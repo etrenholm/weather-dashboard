@@ -10,6 +10,7 @@ var dailyWeatherEl = document.querySelector("#forecast-section")
 var cityButtonSectionEl = document.querySelector("#city-button-section")
 var forecastBox = document.querySelector("#forecast-header")
 var uviRowEl = document.querySelector("#uvi-row")
+var middleSection = document.querySelector("#middle-section")
 
 // get cities from local storage
 var citiesArr = JSON.parse(localStorage.getItem('cities')) || [];
@@ -49,8 +50,11 @@ var getCityCoordinates = function(city) {
         response.json().then(function(data) {
             if(data.length === 0) {
             currentWeatherEl.textContent = "No results found."
+            forecastBox.textContent = ""
+            dailyWeatherEl.textContent = ""
             return;
             }
+            
             // if result is found clear old content
             currentWeatherEl.textContent = ""
             cityTitleRowEl.textContent = ""
@@ -105,11 +109,6 @@ function getWeatherData(lat, lon) {
 };
 
 var displayWeatherData = function(weatherData) {
-    if(weatherData.length === 0) {
-    currentWeatherEl.textContent = "No results found."
-    return;
-    }
-
     // format date
     var unixTime = weatherData.current.dt
     var formatDate = new Date (unixTime * 1000)
