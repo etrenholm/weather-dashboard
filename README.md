@@ -1,4 +1,4 @@
-# Work Day Scheduler
+# Weather Dashboard
 
 ## Table of contents
 * [Description](#description)
