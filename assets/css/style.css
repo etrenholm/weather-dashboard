@@ -69,6 +69,9 @@ input {
     margin-top: 10px;
 }
 
+
+/* BUTTON STYLES */
+
 #city-button-section {
     padding-top: 10px;
 }
@@ -98,7 +101,9 @@ input {
     background-color: olivedrab;
 }
 
-/* UV Index */
+
+/* UV INDEX STYLES */
+
 .favorable {
     color: white;
     font-weight: bold;
@@ -122,6 +127,7 @@ input {
     padding: 10px 20px;
     border-radius: 15px;
 }
+
 
 /* FLEX ITEMS */
 
@@ -178,7 +184,9 @@ input {
     gap: 5px;
 }
 
+
 /* MEDIA SIZES */
+
 @media screen and (max-width: 980px) {
     .day-block {
         width: 48%;

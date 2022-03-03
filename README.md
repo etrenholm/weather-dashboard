@@ -16,7 +16,7 @@ Project was created using:
 * HTML
 * CSS
 * JavaScript
-* Open Weather
+* Open Weather API
 * Terminal (Mac)
 * Git
 * GitHub

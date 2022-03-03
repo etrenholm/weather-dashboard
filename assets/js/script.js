@@ -23,20 +23,20 @@ var citySubmitHandler = function(event) {
     var city = searchInputEl.value.trim();
 
     if (city) {
-        getCityCoordinates(city);
+        getCityCoordinates(city)
         
     } else {
         alert("Please enter a valid city.")
         return false;
     }
-}
+};
 
 // click on city button - resubmit city
 var cityClickHandler = function(event) {
     if(event.target.id) {
         getCityCoordinates(event.target.id)
     }
-}
+};
 
 // get the API to get the coordinates
 var getCityCoordinates = function(city) {
@@ -48,42 +48,43 @@ var getCityCoordinates = function(city) {
     fetch(requestUrl).then(function(response) {
         response.json().then(function(data) {
             if(data.length === 0) {
-            currentWeatherEl.textContent = "No results found.";
+            currentWeatherEl.textContent = "No results found."
             return;
             }
             // if result is found clear old content
-            currentWeatherEl.textContent = "";
-            cityTitleRowEl.textContent = "";
-            dailyWeatherEl.textContent = "";
-            searchInputEl.value = "";
-            forecastBox.textContent = "";
-            uviRowEl.textContent = "";
+            currentWeatherEl.textContent = ""
+            cityTitleRowEl.textContent = ""
+            dailyWeatherEl.textContent = ""
+            searchInputEl.value = ""
+            forecastBox.textContent = ""
+            uviRowEl.textContent = ""
 
             // append city header to page
             currentWeatherEl.appendChild(cityTitleRowEl)
-            var cityEl = document.createElement("h2");
-            cityEl.textContent = data[0].name;
+            var cityEl = document.createElement("h2")
+            cityEl.textContent = data[0].name
             cityTitleRowEl.appendChild(cityEl)
 
             // check if localstorage already has city name
             if (!citiesArr.includes(data[0].name)) {
 
                 // append new city button to side
-                var cityButtonEl = document.createElement("button");
+                var cityButtonEl = document.createElement("button")
+
                 cityButtonEl.setAttribute("id", data[0].name)
-                cityButtonEl.addEventListener("click", cityClickHandler);
+                cityButtonEl.addEventListener("click", cityClickHandler)
                 cityButtonEl.className = "city-btn btn"
-                cityButtonEl.textContent = data[0].name;
-                cityButtonSectionEl.appendChild(cityButtonEl);
+                cityButtonEl.textContent = data[0].name
+                cityButtonSectionEl.appendChild(cityButtonEl)
 
                 // save cities to local storage
-                citiesArr.push(data[0].name);
-                localStorage.setItem('cities', JSON.stringify(citiesArr));
+                citiesArr.push(data[0].name)
+                localStorage.setItem('cities', JSON.stringify(citiesArr))
             }
             
             // push coordinates to next fetch request
-            getWeatherData(data[0].lat, data[0].lon);
-        })
+            getWeatherData(data[0].lat, data[0].lon)
+        });
     })
 }
 
@@ -101,48 +102,48 @@ function getWeatherData(lat, lon) {
             })
         }
     })
-}
+};
 
 var displayWeatherData = function(weatherData) {
     if(weatherData.length === 0) {
-    currentWeatherEl.textContent = "No results found.";
+    currentWeatherEl.textContent = "No results found."
     return;
     }
 
     // format date
-    var unixTime = weatherData.current.dt;
+    var unixTime = weatherData.current.dt
     var formatDate = new Date (unixTime * 1000)
     var date = formatDate.toLocaleDateString()
 
     // append date to city title row
     var dateEl = document.createElement("h2")
-    dateEl.textContent = "(" + date + ")";
-    cityTitleRowEl.appendChild(dateEl) 
+    dateEl.textContent = "(" + date + ")"
+    cityTitleRowEl.appendChild(dateEl)
 
     // append icon to city title row
-    var iconEl = document.createElement("img");
+    var iconEl = document.createElement("img")
     iconEl.src = "https://openweathermap.org/img/wn/" + weatherData.current.weather[0].icon + ".png";
-    var src = document.getElementById("current-weather-section");
-    cityTitleRowEl.appendChild(iconEl);
+    var src = document.getElementById("current-weather-section")
+    cityTitleRowEl.appendChild(iconEl)
 
     // append current weather data to current weather section
-    var tempEl = document.createElement("p");
-    tempEl.textContent = "Temp: " + weatherData.current.temp + "°F";
+    var tempEl = document.createElement("p")
+    tempEl.textContent = "Temp: " + weatherData.current.temp + "°F"
     currentWeatherEl.appendChild(tempEl)
 
-    var windEl = document.createElement("p");
-    windEl.textContent = "Wind: " + weatherData.current.wind_speed + " MPH";
+    var windEl = document.createElement("p")
+    windEl.textContent = "Wind: " + weatherData.current.wind_speed + " MPH"
     currentWeatherEl.appendChild(windEl)
 
     var humidityEl = document.createElement("p");
-    humidityEl.textContent = "Humidity: " + weatherData.current.humidity + "%";
+    humidityEl.textContent = "Humidity: " + weatherData.current.humidity + "%"
     currentWeatherEl.appendChild(humidityEl)
 
     // append uv index to current weather section
     currentWeatherEl.appendChild(uviRowEl)
 
-    var uviEl = document.createElement("p");
-    var uviCondition = document.createElement("p");
+    var uviEl = document.createElement("p")
+    var uviCondition = document.createElement("p")
     uviEl.textContent = "UV Index: "
     uviCondition.textContent = weatherData.current.uvi
     uviRowEl.appendChild(uviEl)
@@ -158,47 +159,47 @@ var displayWeatherData = function(weatherData) {
     }
 
     // append 5 day forecast container to page
-    var dayHeaderEl = document.createElement("h3");
+    var dayHeaderEl = document.createElement("h3")
     dayHeaderEl.textContent = "5-Day Forecast:"
-    forecastBox.appendChild(dayHeaderEl)
+    forecastBox.appendChild(dayHeaderEl);
 
     // loop over weather to get next 5 days
     for (var i = 1; i < 6; i++) {
 
         // create div elements with classes
-        var dailyWeatherBox = document.createElement("div");
+        var dailyWeatherBox = document.createElement("div")
         dailyWeatherBox.className = "day-block"
 
         // format date
-        var unixTime = weatherData.daily[i].dt;
+        var unixTime = weatherData.daily[i].dt
         var formatDate = new Date (unixTime * 1000)
         var date = formatDate.toLocaleDateString()
 
         // create date element and append to box
         var dailyDateEl = document.createElement("h4")
         dailyDateEl.textContent = date
-        dailyWeatherBox.appendChild(dailyDateEl) 
+        dailyWeatherBox.appendChild(dailyDateEl)
 
         // create icon element and append to box
-        var iconEl = document.createElement("img");
-        iconEl.src = "http://openweathermap.org/img/wn/" + weatherData.daily[i].weather[0].icon + ".png";
-        var src = document.getElementById("forecast-section");
-        dailyWeatherBox.appendChild(iconEl);    
+        var iconEl = document.createElement("img")
+        iconEl.src = "http://openweathermap.org/img/wn/" + weatherData.daily[i].weather[0].icon + ".png"
+        var src = document.getElementById("forecast-section")
+        dailyWeatherBox.appendChild(iconEl)
 
         // create temp element and append to box
         var dailyTempEl = document.createElement("p")
-        dailyTempEl.textContent = "Temp: " + weatherData.daily[i].temp.day + "°F";
-        dailyWeatherBox.appendChild(dailyTempEl);
+        dailyTempEl.textContent = "Temp: " + weatherData.daily[i].temp.day + "°F"
+        dailyWeatherBox.appendChild(dailyTempEl)
 
         // create wind element and append to box
         var dailyWindEl = document.createElement("p")
-        dailyWindEl.textContent = "Wind: " + weatherData.daily[i].wind_speed + " MPH";
-        dailyWeatherBox.appendChild(dailyWindEl);
+        dailyWindEl.textContent = "Wind: " + weatherData.daily[i].wind_speed + " MPH"
+        dailyWeatherBox.appendChild(dailyWindEl)
 
         // create wind element and append to box
         var dailyHumidiyEl = document.createElement("p")
-        dailyHumidiyEl.textContent = "Humidity: " + weatherData.daily[i].humidity + "%";
-        dailyWeatherBox.appendChild(dailyHumidiyEl);
+        dailyHumidiyEl.textContent = "Humidity: " + weatherData.daily[i].humidity + "%"
+        dailyWeatherBox.appendChild(dailyHumidiyEl)
 
         // append box to container
         dailyWeatherEl.appendChild(dailyWeatherBox)
@@ -211,10 +212,10 @@ submitButton.addEventListener("click", citySubmitHandler);
 
 // create buttons from local storage on page refresh
 for (var i = 0; i < citiesArr.length; i++) {
-    var cityButtonEl = document.createElement("button");
+    var cityButtonEl = document.createElement("button")
     cityButtonEl.className = "city-btn btn"
     cityButtonEl.setAttribute("id", citiesArr[i])
-    cityButtonEl.addEventListener("click", cityClickHandler);
-    cityButtonEl.textContent = citiesArr[i];
-    cityButtonSectionEl.appendChild(cityButtonEl);
+    cityButtonEl.addEventListener("click", cityClickHandler)
+    cityButtonEl.textContent = citiesArr[i]
+    cityButtonSectionEl.appendChild(cityButtonEl)
 }
